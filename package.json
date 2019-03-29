@@ -1,0 +1,25 @@
+{
+  "name": "service_2",
+  "version": "1.0.0",
+  "description": "dcim service 2 read from data_records and choose a plugin to apply ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zakariadhaimi/plugin.git"
+  },
+  "keywords": [
+    "plugin"
+  ],
+  "author": "zdhaimi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zakariadhaimi/plugin/issues"
+  },
+  "homepage": "https://github.com/zakariadhaimi/plugin#readme",
+  "dependencies": {
+    "mariadb": "^2.0.3"
+  }
+}
