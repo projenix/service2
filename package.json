@@ -4,7 +4,7 @@
   "description": "dcim service 2 read from data_records and choose a plugin to apply ",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
