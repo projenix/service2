@@ -1,5 +1,5 @@
 const mariadb = require('mariadb');
-const conn = mariadb.createPool({host: 'localhost', user: 'root', database: 'dcim_test', connectionLimit: 6});
+const conn = mariadb.createPool({host: '172.18.0.4', user: 'root',password:'root' , database: 'dcim', connectionLimit: 6});
 // select id and oids name of equipment
 let query = "select e.id as id , em.oid_map as oid_map from equipment e join equipment_model em on e.equipment_model= em.id";
 // connect to database
@@ -50,8 +50,10 @@ setInterval(()=>{
                                                     //call caller module that generate random msg for each plugin
                                                     resolve(caller.call(plug.name));
                                                 }).then((result) => {
+                                                        //console.log(r.id+"id")
 
                                                         conn.query("select id from alarms where equipment_id = " + r.id + " and end_time is " + null + " and plugin= \"" + plug.name + "\"").then((exist) => {
+                                                            //console.log("select id from alarms where equipment_id = " + r.id + " and end_time= " + null + " and plugin= \"" + plug.name + "\"");
                                                             conn.end();
                                                             console.log(result);
                                                             let date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -82,6 +84,7 @@ setInterval(()=>{
                                                         })
                                                     }
                                                 )
+                                                console.log('work');
                                             })
                                         })
                                 })
@@ -102,7 +105,7 @@ var object_transformer = (name, value) => {
     let fusion = {}
     for (let v in value) {
         let _v = "." + v.replace(/,/g, '.');
-        //fusion.date = new ate(res.date_time);
+        //fusion.date = new Date(res.date_time);
 
         fusion[name[_v]] = value[v];
     }
