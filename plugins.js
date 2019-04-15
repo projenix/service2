@@ -1,31 +1,56 @@
-module.exports.call = function (name) {
-    retour = tab[Math.floor(Math.random() * 2)];
+module.exports.call = function (name, data) {
 
     switch (name) {
-        case "plugin1":
-            return plugin1(name);
+        case "antifreeze":
+            return antifreeze(data);
+        case "low_pressure":
+            return low_pressure(data);
 
-        case "plugin2":
-            return plugin2(name);
-
-        case "plugin3":
-            return plugin3(name);
-        case "plugin4":
-            return plugin4(name);
 
     }
 };
+let antifreeze = (data) => {
+    let array_data = Object.values(data);
+    if (array_data[4]["C1_Compressor_1"] === 1 || array_data[4]["C1_Compressor_2"] === 1) {
+        console.log('antigreeze work');
+        let counter = 0;
 
-let tab = [0, "there is a problem  "];
-let plugin1 = (name) => {
-    return (typeof retour) === "number" ? retour : (retour + name)
+        for (let i = 0; i <= 4; i++) {
+            if ((array_data[i]["C1_evaporator_temperature"] / 10) < 5) {
+                return "temperature d'évaporateur est inférieure à 5  ";
+            }
+
+            let delta = (array_data[i]["Setpoint_effective"] / 10) - (array_data[i]["C1_evaporator_temperature"] / 10);
+            if (delta > 15) {
+                counter++;
+            }
+            if (counter === 5) {
+                
+                return "Difference entre setpoint effective et la temperature d évaporateur dépasse 5 durant 20 sec "
+            }
+
+
+        }
+        return 0;
+    }
+    return 0;
 };
-let plugin2 = (name) => {
-    return (typeof retour) === "number" ? retour : (retour + name)
-};
-let plugin3 = (name) => {
-    return (typeof retour) === "number" ? retour : (retour + name)
-};
-let plugin4 = (name) => {
-    return (typeof retour) === "number" ? retour : (retour + name)
-};
+
+
+let low_pressure = (data) => {
+    let array_data = Object.values(data);
+    if (array_data[10]["C2_Compressor_1"] === 1 || array_data[10]["C2_Compressor_2"] === 1) {
+        console.log('low pressure work');
+
+        for (let i = 0; i <= 10; i++) {
+            if ((array_data[i]["C2_condenser_pressure2"] / 10) < 23) {
+                console.log("Condenser pressure is Below 23 ")
+                return "pression du condenseur est inférieure à 23 ";
+            }
+
+        }
+        return 0;
+    }
+    return 0;
+
+}
