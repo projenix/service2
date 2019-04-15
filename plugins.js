@@ -21,7 +21,7 @@ let antifreeze = (data) => {
             }
 
             let delta = (array_data[i]["Setpoint_effective"] / 10) - (array_data[i]["C1_evaporator_temperature"] / 10);
-            if (delta > 15) {
+            if (delta > 5) {
                 counter++;
             }
             if (counter === 5) {
