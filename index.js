@@ -38,17 +38,18 @@ setInterval(()=>{
                                     }
                                 ).then((name_value) => {
                                     //select plugins list of equipment using r.id from the first query
-                                    conn.query("select p.name from plugins p join equipment e on e.equipment_model=p.equipment_model where e.id=" + r.id)
+                                     conn.query("select p.name,p.path from plugins p join equipment e on e.equipment_model=p.equipment_model where e.id=" + r.id)
                                         .then((plugin_list) => {
                                             conn.end();
                                             //just a test
-                                            let caller = require('./plugins');
                                             // for each plugins "plug"
                                             plugin_list.forEach((plug) => {
+                                                let caller = require(plug.path);
+
                                                 // create promise
                                                 new Promise((resolve, reject) => {
                                                     //call caller module that generate random msg for each plugin
-                                                    resolve(caller.call(plug.name));
+                                                    resolve(caller.call(name_value));
                                                 }).then((result) => {
                                                         //console.log(r.id+"id")
 
