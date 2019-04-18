@@ -4,11 +4,11 @@
   "description": "dcim service 2 read from data_records and choose a plugin to apply ",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js "
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zakariadhaimi/plugin.git"
+    "url": "git+https://github.com/zakariadhaimi/service2.git"
   },
   "keywords": [
     "plugin"
@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/zakariadhaimi/plugin#readme",
   "dependencies": {
+    "@zdhaimi/antifreeze": "^1.0.1",
+    "low_pressure": "^1.0.0",
     "mariadb": "^2.0.3"
   }
 }
