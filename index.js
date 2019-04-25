@@ -52,7 +52,6 @@ setInterval(() => {
                                             //just a test
                                             // for each plugins "plug"
                                             plugin_list.forEach((plug) => {
-                                                console.log(plug.path);
                                                 let caller = require(plug.path);
 
                                                 // create promise
@@ -60,12 +59,10 @@ setInterval(() => {
                                                     //call caller module that generate random msg for each plugin
                                                     resolve(caller.call(name_value));
                                                 }).then((result) => {
-                                                        //console.log(r.id+"id")
 
                                                         conn.query("select id from alarms where equipment_id = " + r.id + " and end_time is " + null + " and plugin= \"" + plug.name + "\"").then((exist) => {
                                                             //console.log("select id from alarms where equipment_id = " + r.id + " and end_time= " + null + " and plugin= \"" + plug.name + "\"");
                                                             conn.end();
-                                                            //console.log(exist);
                                                             let date = result.date;
                                                             if (typeof result.msg == "number" && exist[0] !== undefined) {
                                                                 //update end date
@@ -81,7 +78,7 @@ setInterval(() => {
                                                                 if (typeof result.msg == "string" && exist[0] === undefined) {
                                                                     //insert
                                                                     console.log("insert")
-                                                                    conn.query(" INSERT INTO alarms values (?,?,?,?,?,?,?,?)", [null, result.ids,plug.name, "alarm", r.id, result.msg, date, null])
+                                                                    conn.query(" INSERT INTO alarms values (?,?,?,?,?,?,?,?)", [null, result.ids, plug.name, "alarm", r.id, result.msg, date, null])
                                                                         .then(
                                                                             () => {
                                                                                 conn.end();
