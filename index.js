@@ -3,9 +3,9 @@ const conn = mariadb.createPool({host: '172.18.0.4', user: 'root',password:'root
 // select id and oids name of equipment
 let query = "select e.id as id , em.oid_map as oid_map from equipment e join equipment_model em on e.equipment_model= em.id";
 // connect to database
-setInterval(()=>{
+setInterval(() => {
 
-    conn.getConnection()
+    pool.getConnection()
         .then(conn => {
             conn.query(query)
                 .then(
@@ -17,7 +17,7 @@ setInterval(()=>{
                             //r = equipment (id,oid_map)
                             (r) => {
                                 //select data from last insert and 6hours interval
-                                let query_data = "select d.date_time, d.data from data_records d where date_time between(select date_sub(max(date_time),interval 6 hour) from data_records) AND (select max(date_time) from data_records) and equipment_id=" + r.id + " order by date_time desc";
+                                let query_data = "select id,d.date_time, d.data from data_records d where date_time between(select date_sub(max(date_time),interval 5 minute) from data_records) AND (select max(date_time) from data_records) and equipment_id=" + r.id + " order by date_time desc";
 
                                 conn.query(query_data, r.id).then(
                                     (data) => {
@@ -28,9 +28,17 @@ setInterval(()=>{
                                         // transform oid_map string to object
                                         let name = JSON.parse(r.oid_map);
                                         //for each record (d) of last query set object name_value={date:{name:value},...} with object_transformer function below
+                                        let arr_data = [];
+                                        let arr_date = [];
+                                        let arr_id = [];
                                         data.forEach((d) => {
                                             let value = JSON.parse(d.data);
-                                            name_value[new Date(d.date_time).toLocaleString()] = object_transformer(name, value);
+                                            arr_data.push(object_transformer(name, value));
+                                            arr_id.push(d.id);
+                                            arr_date.push(new Date(d.date_time).toLocaleString());
+                                            name_value.data = arr_data;
+                                            name_value.id = arr_id;
+                                            name_value.date = arr_date;
 
                                         })
                                         //return the object that every plugin will take it as parameter
@@ -38,12 +46,13 @@ setInterval(()=>{
                                     }
                                 ).then((name_value) => {
                                     //select plugins list of equipment using r.id from the first query
-                                     conn.query("select p.name,p.path from plugins p join equipment e on e.equipment_model=p.equipment_model where e.id=" + r.id)
+                                    conn.query("select p.name,p.path from plugins p join equipment e on e.equipment_model=p.equipment_model where e.id=" + r.id)
                                         .then((plugin_list) => {
                                             conn.end();
                                             //just a test
                                             // for each plugins "plug"
                                             plugin_list.forEach((plug) => {
+                                                console.log(plug.path);
                                                 let caller = require(plug.path);
 
                                                 // create promise
@@ -56,10 +65,9 @@ setInterval(()=>{
                                                         conn.query("select id from alarms where equipment_id = " + r.id + " and end_time is " + null + " and plugin= \"" + plug.name + "\"").then((exist) => {
                                                             //console.log("select id from alarms where equipment_id = " + r.id + " and end_time= " + null + " and plugin= \"" + plug.name + "\"");
                                                             conn.end();
-                                                            console.log(result);
-                                                            let date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-
-                                                            if (typeof result == "number" && exist[0] !== undefined) {
+                                                            //console.log(exist);
+                                                            let date = result.date;
+                                                            if (typeof result.msg == "number" && exist[0] !== undefined) {
                                                                 //update end date
                                                                 console.log("update");
 
@@ -69,23 +77,23 @@ setInterval(()=>{
                                                                             conn.end();
                                                                         }
                                                                     );
-                                                            } else{
-                                                                if (typeof result == "string" && exist[0] === undefined) {
+                                                            } else {
+                                                                if (typeof result.msg == "string" && exist[0] === undefined) {
                                                                     //insert
                                                                     console.log("insert")
-                                                                    conn.query(" INSERT INTO alarms values (?,?,?,?,?,?,?)", [null, plug.name, "alarm", r.id, result,date,null])
+                                                                    conn.query(" INSERT INTO alarms values (?,?,?,?,?,?,?,?)", [null, result.ids,plug.name, "alarm", r.id, result.msg, date, null])
                                                                         .then(
                                                                             () => {
                                                                                 conn.end();
                                                                             }
                                                                         );
 
-                                                                }}
+                                                                }
+                                                            }
 
                                                         })
                                                     }
                                                 )
-                                                console.log('work');
                                             })
                                         })
                                 })
@@ -99,7 +107,7 @@ setInterval(()=>{
     ;
 
 
-},5000)
+}, 5000)
 
 //function transform take as input data_record and _oid map an return object like {name:value}
 var object_transformer = (name, value) => {
