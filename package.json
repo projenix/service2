@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/zakariadhaimi/plugin#readme",
   "dependencies": {
-    "@zdhaimi/antifreeze": "^1.0.2",
-    "@zdhaimi/low_pressure": "^1.0.1",
+    "antifreeze": "file:../module/antifreeze",
+    "low_pressure": "file:../moule/low_pressure",
     "mariadb": "^2.0.3"
   }
 }
